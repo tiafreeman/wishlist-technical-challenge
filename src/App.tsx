@@ -1,9 +1,9 @@
-import WishList from "./components/WishList.tsx";
+import WishListPage from "./pages/WishListPage.tsx";
 
 function App() {
   return (
     <>
-      <WishList />
+      <WishListPage />
     </>
   );
 }
