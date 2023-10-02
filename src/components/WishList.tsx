@@ -5,12 +5,13 @@ import { useDrop } from "react-dnd";
 import { ItemTypes } from "../constants.ts";
 
 type WishListProps = {
-  books: Book[];
+  hiddenBooks: Book[];
+  wishListBooks: Book[];
 };
 
-function WishList({ books }: WishListProps) {
-  const [hiddenList, setHiddenList] = useState<Book[]>([]);
-  const [wishList, setWishList] = useState<Book[]>(books);
+function WishList({ hiddenBooks, wishListBooks }: WishListProps) {
+  const [hiddenList, setHiddenList] = useState<Book[]>(hiddenBooks);
+  const [wishList, setWishList] = useState<Book[]>(wishListBooks);
   const [{ isOver }, dropRef] = useDrop({
     accept: ItemTypes.CARD,
     drop: (item: Book) =>
@@ -18,12 +19,31 @@ function WishList({ books }: WishListProps) {
         setWishList((wishList) =>
           wishList.filter((book) => book.id !== item.id),
         );
-        return !hiddenList.includes(item) ? [...hiddenList, item] : hiddenList;
+        return hiddenList.some((book) => book.id === item.id)
+          ? hiddenList
+          : [...hiddenList, item];
       }),
     collect: (monitor) => ({
       isOver: monitor.isOver(),
     }),
   });
+
+  const [{ isOver: isOver2 }, dropZone2] = useDrop({
+    accept: ItemTypes.CARD,
+    drop: (item: Book) =>
+      setWishList((wishList) => {
+        setHiddenList((hiddenList) =>
+          hiddenList.filter((book) => book.id !== item.id),
+        );
+        return wishList.some((book) => book.id === item.id)
+          ? wishList
+          : [...wishList, item];
+      }),
+    collect: (monitor) => ({
+      isOver: monitor.isOver(),
+    }),
+  });
+
   return (
     <div
       style={{
@@ -56,17 +76,22 @@ function WishList({ books }: WishListProps) {
           </p>
         </div>
       </header>
-      {wishList.map((bookInfo) => (
-        <ListItem
-          id={bookInfo.id}
-          title={bookInfo.title}
-          author={bookInfo.author}
-        />
-      ))}
-      <div ref={dropRef} style={{ width: "100%" }}>
+      <div ref={dropZone2} style={{ minHeight: 100, width: "100%" }}>
+        {wishList.map((bookInfo) => (
+          <ListItem
+            key={bookInfo.id}
+            id={bookInfo.id}
+            title={bookInfo.title}
+            author={bookInfo.author}
+          />
+        ))}
+        {isOver2 && <div style={{ minHeight: 100 }}>Drop Here!</div>}
+      </div>
+      <div ref={dropRef} style={{ minHeight: 100, width: "100%" }}>
         <div>------Hidden items------</div>
         {hiddenList.map((bookInfo) => (
           <ListItem
+            key={bookInfo.id}
             id={bookInfo.id}
             title={bookInfo.title}
             author={bookInfo.author}
