@@ -1,11 +1,29 @@
+import { useState } from "react";
 import Book from "../types/book.ts";
 import ListItem from "./ListItem.tsx";
+import { useDrop } from "react-dnd";
+import { ItemTypes } from "../constants.ts";
 
 type WishListProps = {
   books: Book[];
 };
 
 function WishList({ books }: WishListProps) {
+  const [hiddenList, setHiddenList] = useState<Book[]>([]);
+  const [wishList, setWishList] = useState<Book[]>(books);
+  const [{ isOver }, dropRef] = useDrop({
+    accept: ItemTypes.CARD,
+    drop: (item: Book) =>
+      setHiddenList((hiddenList) => {
+        setWishList((wishList) =>
+          wishList.filter((book) => book.id !== item.id),
+        );
+        return !hiddenList.includes(item) ? [...hiddenList, item] : hiddenList;
+      }),
+    collect: (monitor) => ({
+      isOver: monitor.isOver(),
+    }),
+  });
   return (
     <div
       style={{
@@ -38,9 +56,24 @@ function WishList({ books }: WishListProps) {
           </p>
         </div>
       </header>
-      {books.map((bookInfo) => (
-        <ListItem title={bookInfo.title} author={bookInfo.author} />
+      {wishList.map((bookInfo) => (
+        <ListItem
+          id={bookInfo.id}
+          title={bookInfo.title}
+          author={bookInfo.author}
+        />
       ))}
+      <div ref={dropRef} style={{ width: "100%" }}>
+        <div>------Hidden items------</div>
+        {hiddenList.map((bookInfo) => (
+          <ListItem
+            id={bookInfo.id}
+            title={bookInfo.title}
+            author={bookInfo.author}
+          />
+        ))}
+        {isOver && <div style={{ minHeight: 400 }}>Drop Here!</div>}
+      </div>
     </div>
   );
 }

@@ -2,13 +2,15 @@ import { useDrag } from "react-dnd";
 import { ItemTypes } from "../constants.ts";
 
 type ListItemProps = {
+  id: string;
   title: string;
   author: string;
 };
 
-function ListItem({ title, author }: ListItemProps) {
+function ListItem({ id, title, author }: ListItemProps) {
   const [{ isDragging }, dragRef] = useDrag(() => ({
     type: ItemTypes.CARD,
+    item: { id, title, author },
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
