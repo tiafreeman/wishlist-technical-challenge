@@ -12,7 +12,7 @@ type WishListProps = {
 function WishList({ hiddenBooks, wishListBooks }: WishListProps) {
   const [hiddenList, setHiddenList] = useState<Book[]>(hiddenBooks);
   const [wishList, setWishList] = useState<Book[]>(wishListBooks);
-  const [{ isOver }, dropRef] = useDrop({
+  const [{ hiddenListHover }, dropRef] = useDrop({
     accept: ItemTypes.CARD,
     drop: (item: Book) =>
       setHiddenList((hiddenList) => {
@@ -24,11 +24,11 @@ function WishList({ hiddenBooks, wishListBooks }: WishListProps) {
           : [...hiddenList, item];
       }),
     collect: (monitor) => ({
-      isOver: monitor.isOver(),
+      hiddenListHover: monitor.isOver(),
     }),
   });
 
-  const [{ isOver: isOver2 }, dropZone2] = useDrop({
+  const [{ wishListHover }, dropZone2] = useDrop({
     accept: ItemTypes.CARD,
     drop: (item: Book) =>
       setWishList((wishList) => {
@@ -40,7 +40,7 @@ function WishList({ hiddenBooks, wishListBooks }: WishListProps) {
           : [...wishList, item];
       }),
     collect: (monitor) => ({
-      isOver: monitor.isOver(),
+      wishListHover: monitor.isOver(),
     }),
   });
 
@@ -48,12 +48,18 @@ function WishList({ hiddenBooks, wishListBooks }: WishListProps) {
     <div
       style={{
         width: "30%",
-        background: "#EB5A52",
+        background: "#725AC1",
         borderRadius: 5,
         padding: "1rem",
       }}
     >
-      <header style={{ display: "flex", justifyContent: "space-between" }}>
+      <header
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          marginBottom: 10,
+        }}
+      >
         <div>
           <p>Shopping</p>
           <h2>Wish List</h2>
@@ -67,7 +73,7 @@ function WishList({ hiddenBooks, wishListBooks }: WishListProps) {
           <p
             style={{
               background: "#F4F4F4",
-              color: "#EF8774",
+              color: "#725AC1",
               borderRadius: 2,
               padding: "0.1rem",
             }}
@@ -76,7 +82,7 @@ function WishList({ hiddenBooks, wishListBooks }: WishListProps) {
           </p>
         </div>
       </header>
-      <div ref={dropZone2} style={{ minHeight: 100, width: "100%" }}>
+      <div ref={dropZone2} style={{ minHeight: 50, width: "100%" }}>
         {wishList.map((bookInfo) => (
           <ListItem
             key={bookInfo.id}
@@ -85,10 +91,22 @@ function WishList({ hiddenBooks, wishListBooks }: WishListProps) {
             author={bookInfo.author}
           />
         ))}
-        {isOver2 && <div style={{ minHeight: 100 }}>Drop Here!</div>}
+        {wishListHover && (
+          <section
+            style={{
+              opacity: 0.3,
+              width: "100%",
+              height: 40,
+              background: "#AFA2FF",
+              boxShadow: "0px 5px 5px rgba(0, 0, 0, 0.10)",
+              borderRadius: 5,
+              marginBottom: 10,
+            }}
+          />
+        )}
       </div>
       <div ref={dropRef} style={{ minHeight: 100, width: "100%" }}>
-        <div>------Hidden items------</div>
+        <div style={{ marginBottom: 10 }}>------Hidden items------</div>
         {hiddenList.map((bookInfo) => (
           <ListItem
             key={bookInfo.id}
@@ -97,7 +115,19 @@ function WishList({ hiddenBooks, wishListBooks }: WishListProps) {
             author={bookInfo.author}
           />
         ))}
-        {isOver && <div style={{ minHeight: 400 }}>Drop Here!</div>}
+        {hiddenListHover && (
+          <section
+            style={{
+              opacity: 0.3,
+              width: "100%",
+              height: 40,
+              background: "#AFA2FF",
+              boxShadow: "0px 5px 5px rgba(0, 0, 0, 0.10)",
+              borderRadius: 5,
+              marginBottom: 10,
+            }}
+          />
+        )}
       </div>
     </div>
   );
