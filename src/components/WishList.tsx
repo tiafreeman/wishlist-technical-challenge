@@ -9,10 +9,28 @@ type WishListProps = {
   wishListBooks: Book[];
 };
 
+// This is the placeholder card that shows up when you drag a book item over a list
+function PlaceholderCard() {
+  return (
+    <section
+      style={{
+        opacity: 0.5,
+        width: "100%",
+        height: 40,
+        background: "#AFA2FF",
+        boxShadow: "0px 5px 5px rgba(0, 0, 0, 0.10)",
+        borderRadius: 5,
+        marginBottom: 10,
+      }}
+    />
+  );
+}
+
 function WishList({ hiddenBooks, wishListBooks }: WishListProps) {
   const [hiddenList, setHiddenList] = useState<Book[]>(hiddenBooks);
   const [wishList, setWishList] = useState<Book[]>(wishListBooks);
-  const [{ hiddenListHover }, dropRef] = useDrop({
+
+  const [{ hiddenListHover }, hiddenDropRef] = useDrop({
     accept: ItemTypes.CARD,
     drop: (item: Book) =>
       setHiddenList((hiddenList) => {
@@ -28,7 +46,7 @@ function WishList({ hiddenBooks, wishListBooks }: WishListProps) {
     }),
   });
 
-  const [{ wishListHover }, dropZone2] = useDrop({
+  const [{ wishListHover }, wishListDropRef] = useDrop({
     accept: ItemTypes.CARD,
     drop: (item: Book) =>
       setWishList((wishList) => {
@@ -47,7 +65,7 @@ function WishList({ hiddenBooks, wishListBooks }: WishListProps) {
   return (
     <div
       style={{
-        width: "30%",
+        width: "50%",
         background: "#725AC1",
         borderRadius: 5,
         padding: "1rem",
@@ -57,7 +75,7 @@ function WishList({ hiddenBooks, wishListBooks }: WishListProps) {
         style={{
           display: "flex",
           justifyContent: "space-between",
-          marginBottom: 10,
+          marginBottom: 16,
         }}
       >
         <div>
@@ -82,7 +100,7 @@ function WishList({ hiddenBooks, wishListBooks }: WishListProps) {
           </p>
         </div>
       </header>
-      <div ref={dropZone2} style={{ minHeight: 50, width: "100%" }}>
+      <div ref={wishListDropRef} style={{ minHeight: 50, width: "100%" }}>
         {wishList.map((bookInfo) => (
           <ListItem
             key={bookInfo.id}
@@ -91,22 +109,12 @@ function WishList({ hiddenBooks, wishListBooks }: WishListProps) {
             author={bookInfo.author}
           />
         ))}
-        {wishListHover && (
-          <section
-            style={{
-              opacity: 0.3,
-              width: "100%",
-              height: 40,
-              background: "#AFA2FF",
-              boxShadow: "0px 5px 5px rgba(0, 0, 0, 0.10)",
-              borderRadius: 5,
-              marginBottom: 10,
-            }}
-          />
-        )}
+        {wishListHover && <PlaceholderCard />}
       </div>
-      <div ref={dropRef} style={{ minHeight: 100, width: "100%" }}>
-        <div style={{ marginBottom: 10 }}>------Hidden items------</div>
+      <div ref={hiddenDropRef} style={{ minHeight: 100, width: "100%" }}>
+        <div style={{ marginBottom: 20, marginTop: 20 }}>
+          ------Hidden items------
+        </div>
         {hiddenList.map((bookInfo) => (
           <ListItem
             key={bookInfo.id}
@@ -115,19 +123,7 @@ function WishList({ hiddenBooks, wishListBooks }: WishListProps) {
             author={bookInfo.author}
           />
         ))}
-        {hiddenListHover && (
-          <section
-            style={{
-              opacity: 0.3,
-              width: "100%",
-              height: 40,
-              background: "#AFA2FF",
-              boxShadow: "0px 5px 5px rgba(0, 0, 0, 0.10)",
-              borderRadius: 5,
-              marginBottom: 10,
-            }}
-          />
-        )}
+        {hiddenListHover && <PlaceholderCard />}
       </div>
     </div>
   );
